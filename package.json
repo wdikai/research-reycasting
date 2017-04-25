@@ -1,0 +1,22 @@
+{
+  "name": "research-reycasting",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run build:w\" \"npm run lite\" ",
+    "prestart": "npm i && npm run build",
+    "lite": "lite-server",
+    "build": "tsc",
+    "build:w": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^3.4.0",
+    "lite-server": "^2.3.0",
+    "typescript": "^2.2.2"
+  }
+}
