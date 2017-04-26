@@ -10,7 +10,7 @@ window.addEventListener('keydown', function (event) {
     keys[keyCode] = true;
 });
 
-export class Input {
+export default class Input {
     static SPACE_KEY = 32;
     static LEFT_ARROW_KEY = 37;
     static UP_ARROW_KEY = 38;
