@@ -1,31 +1,34 @@
 import {
-    Vector2,
+    Vector2D,
     Point,
-    toRudian
-} from './math';
+    toRudian,
+    toDecimal
+} from './index';
 
 import Map from './map';
 
 export interface RayStep {
     length2: number;
-    position ? : Vector2;
+    position ? : Vector2D;
 }
 
 export interface RayHit {
     distance: number;
-    position: Vector2;
-    height ? : number
+    position: Vector2D;
+    height?: number;
+    offset?: number;
 }
 
 export class Ray {
-    static cast(map: Map, position: Vector2, angle: number, range: number): RayHit[] {
+    static cast(map: Map, position: Vector2D, angle: number, range: number): RayHit[] {
         let hit: RayHit = {
                 position,
-                distance: 0
+                distance: 0,
+                height: 0
             },
             nextX: RayStep,
             nextY: RayStep,
-            nextPosition: Vector2,
+            nextPosition: Vector2D,
             result: RayHit[] = [];
 
         const sin: number = Math.sin(toRudian(angle));
@@ -39,11 +42,16 @@ export class Ray {
             nextPosition = nextX.length2 < nextY.length2 ?
                 nextX.position :
                 nextY.position;
+            const [shiftX, shiftY] = nextX.length2 < nextY.length2 ? [1, 0] : [0, 1];
+
+            var dx = cos < 0 ? shiftX : 0;
+            var dy = sin < 0 ? shiftY : 0;
 
             hit = {
                 position: nextPosition,
                 distance: position.distance(nextPosition),
-                height: map.get(nextPosition.x, nextPosition.y)
+                height: map.get(nextPosition.x - dx, nextPosition.y - dy),
+                offset: nextX.length2 < nextY.length2? toDecimal(nextX.position.y) :  toDecimal(nextY.position.x)
             };
         }
         return result;
@@ -57,7 +65,7 @@ export class Ray {
             Math.floor(position.x + 1) - position.x :
             Math.ceil(position.x - 1) - position.x;
         const dy = dx * (sin / cos);
-        const nextPosition = new Vector2(position.x + dx, position.y + dy);
+        const nextPosition = new Vector2D(position.x + dx, position.y + dy);
 
         return {
             position: nextPosition,
@@ -73,7 +81,7 @@ export class Ray {
             Math.floor(position.y + 1) - position.y :
             Math.ceil(position.y - 1) - position.y;
         const dx = dy * (cos / sin);
-        const nextPosition = new Vector2(position.x + dx, position.y + dy);
+        const nextPosition = new Vector2D(position.x + dx, position.y + dy);
 
         return {
             position: nextPosition,

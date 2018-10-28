@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run build:w\" \"npm run lite\" ",
+    "start": "npm run dev",
     "prestart": "npm i && npm run build",
     "lite": "lite-server",
     "build": "tsc",
     "build:w": "tsc -w",
+    "dev": "concurrently \"npm run build:w\" \"npm run lite\" ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

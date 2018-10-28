@@ -20,18 +20,6 @@ export default class Map {
         return this.map[y * this.size + x];
     }
 
-    render(graphics: CanvasRenderingContext2D) {
-        const wallSize = this.wallSize;
-
-        for (let yOffset = 0; yOffset < this.size; yOffset++) {
-            for (let xOffset = 0; xOffset < this.size; xOffset++) {
-
-                graphics.fillStyle = this.get(xOffset, yOffset) ? '#909090' : '#c0c0c0';
-                graphics.fillRect(xOffset * wallSize, yOffset * wallSize, wallSize, wallSize);
-            }
-        }
-    }
-
     static generate(size: number, wallSize: number = 1, shans:number): Map {
         const map = [];
         for (var i = 0; i < size * size; i++) {
