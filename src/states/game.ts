@@ -92,6 +92,14 @@ export class GameState implements State {
         renderer.setColor(this.floorColor);
         renderer.fillRect(0, halfHeight, this.camera.width, halfHeight);
         this.camera.draw(renderer);
+
+        if(TouchManager.isTouched) {
+            TouchManager.touches.forEach(touch => {
+                renderer.setZIndex(0);
+                renderer.arc(touch.position.x, touch.position.y, 20, 0, 360, 5);
+                renderer.arc(touch.lastTouch.x, touch.lastTouch.y, 30, 0, 360, 5);
+            });
+        }
     }
 
     update(time: number) {
@@ -104,7 +112,7 @@ export class GameState implements State {
         
         TouchManager.touches.forEach(touch => {
             if(touch.position.x > this.camera.width) {
-                this.camera.rotate(touch.move.x * this.rotateSpeed * 3);
+                this.camera.rotate(-touch.move.x * this.rotateSpeed * time);
             } else {
                 this.camera.move(touch.move.normalize().scale(this.movementSpeed * time));
             }

@@ -1,4 +1,5 @@
 import { Color } from "./color";
+import { toRudian } from "../math/utils";
 
 declare type CanvasImageSource = any;
 
@@ -6,15 +7,50 @@ interface Shape2D {
     x: number;
     y: number;
 
-    width: number;
-    heigh: number;
-
+    width?: number;
+    heigh?: number;
     zIndex: number;
 
     hasShade: boolean;
 
     draw(graphics: CanvasRenderingContext2D): void;
 }
+
+class Arc2D implements Shape2D {
+    x: number;
+    y: number;
+    radius: number;
+    startAngle: number;
+    endAngle: number;
+    width: number;
+    zIndex: number;
+    hasShade: boolean;
+    color: Color;
+    filled: boolean;
+
+    constructor(data) {
+        this.x = data.x;
+        this.y = data.y;
+        this.radius = data.radius;
+        this.startAngle = data.startAngle;
+        this.endAngle = data.endAngle;
+        this.width = data.width;
+        this.zIndex = data.zIndex;
+        this.color = data.color;
+        this.filled = data.filled;
+        this.hasShade = false;
+    }
+
+    draw(graphics: CanvasRenderingContext2D): void {
+        graphics.fillStyle = this.color.toString();
+        graphics.beginPath();
+        graphics.lineWidth = this.width;
+        graphics.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle);
+        this.filled ? graphics.fill(): graphics.stroke();
+        graphics.closePath()
+    }
+}
+
 
 class FilledRectangle implements Shape2D {
     x: number;
@@ -126,6 +162,22 @@ export class BufferRenderer {
         }));
     }
 
+    arc(x, y, r, sAngle = 0, eAngle = 360, width = 1, filled = false) {
+        const { color, zIndex } = this;
+        const radius = Math.floor(r);
+        this.buffer.push(new Arc2D({
+            x: Math.floor(x),
+            y: Math.floor(y),
+            startAngle: toRudian(sAngle),
+            endAngle: toRudian(eAngle),
+            width: Math.floor(width),
+            radius,
+            filled,
+            color,
+            zIndex,
+        }));
+    }
+
     drawImage(image: CanvasImageSource, x: number, y: number, width?: number, heigh?: number, clipX?: number, clipY?: number, clipWidth?: number, clipHeigh?: number): void {
         const { zIndex, hasShade } = this;
 
@@ -152,7 +204,7 @@ export class BufferRenderer {
             .forEach(operation => {
                 operation.draw(this.graphics);
 
-                if(operation.hasShade) {
+                if(operation.hasShade && operation.width && operation.heigh) {
                     this.graphics.fillStyle = "#000000";
                     this.graphics.globalAlpha = 1 - (1 - (operation.zIndex / this.maxZIndex));
                     this.graphics.fillRect(operation.x, operation.y, operation.width, operation.heigh);

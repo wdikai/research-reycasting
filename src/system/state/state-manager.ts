@@ -39,7 +39,6 @@ export class StateManager implements State {
         }
 
         this.currentState = newState;
-        console.log('setState', stateName);
     }
 
     public update (deltaTime: number): void {

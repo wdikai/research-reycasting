@@ -13,7 +13,7 @@ window.addEventListener('touchstart', (event: TouchEvent) => {
     const changedTouches = event.changedTouches;
     for (let touchNumber = 0; touchNumber < event.changedTouches.length; touchNumber++) {
         const touchEvent = changedTouches[touchNumber];
-        const position = new Vector2D(touchEvent.screenX, touchEvent.screenY);
+        const position = new Vector2D(touchEvent.clientX, touchEvent.clientY);
         touchDatas[touchEvent.identifier] = {
             identifier: touchEvent.identifier,
             move: Vector2D.zero,
@@ -29,24 +29,16 @@ window.addEventListener('touchmove', (event: TouchEvent) => {
         const touchData = touchDatas[touchEvent.identifier] || {
             identifier: touchEvent.identifier
         };
-        const move = new Vector2D(touchEvent.screenX, touchEvent.screenY)
-        if (touchData.lastTouch) {
-            touchData.move = touchData.lastTouch.sub(move);
-        }
-
-        touchData.lastTouch = move;
+        
+        touchData.lastTouch = new Vector2D(touchEvent.clientX, touchEvent.clientY);
+        touchData.move = touchData.position.sub(touchData.lastTouch).normalize();
     }
 });
 window.addEventListener('touchend', (event: TouchEvent) => {
     const changedTouches = event.changedTouches;
     for (let touchNumber = 0; touchNumber < event.changedTouches.length; touchNumber++) {
         const touchEvent = changedTouches[touchNumber];
-        const touchData = touchDatas[touchEvent.identifier] || {
-            identifier: touchEvent.identifier
-        };
-        const move = new Vector2D(touchEvent.screenX, touchEvent.screenY)
-        touchData.move = touchData.lastTouch.sub(move);
-        touchData.lastTouch = null;
+        delete touchDatas[touchEvent.identifier];
     }
 });
 

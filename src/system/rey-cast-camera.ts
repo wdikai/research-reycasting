@@ -7,7 +7,7 @@ import { World } from "./world";
 const TILE_SIZE = 16;
 
 const image = new Image();
-image.src = '/assets/tiles.png'
+image.src = './assets/tiles.png'
 
 interface CameraOptions {
     position: Vector2D;
