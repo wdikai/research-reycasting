@@ -99,6 +99,13 @@ export class Vector2D implements Point {
         return this.divide(this.length);
     }
 
+    rotate(angle) {
+        const cos = Math.cos(toRudian(angle));
+        const sin = Math.sin(toRudian(angle));
+
+        return new Vector2D((cos * this.x - sin * this.y), (sin * this.x + cos * this.y));
+    }
+
     scalar(to: Point): number {
         return Vector2D.dot(this, to);
     }

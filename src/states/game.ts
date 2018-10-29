@@ -6,6 +6,7 @@ import { World } from "../system/world";
 import { Color } from "../graphics/color";
 import { State } from "../system/state/state";
 import Map from "../math/map";
+import { Player } from "./entity/player";
 
 const wallMap = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -42,9 +43,8 @@ const viewDistance = 30;
 export class GameState implements State {
     world: World;
     camera: RayCastCamera;
+    player: Player;
 
-    rotateSpeed = 0.05;
-    movementSpeed = 0.01;
 
     floorColor = new Color(150,150,150);
     cailColor = new Color(200,200,200);
@@ -55,7 +55,7 @@ export class GameState implements State {
 
         const position = new Vector2D(7.2, 3);
 
-        const angle = 90;
+        const angle = 180;
         const rayDistance = viewDistance - 1;
         const viewAngle = 60;
         const rayCount = width / columnSize;
@@ -75,11 +75,19 @@ export class GameState implements State {
             width,
             height,
             columnSize,
-            world
+            world,
+            scale: 1
         });
 
         this.world = world;
         this.camera = camera;
+
+        this.player = new Player();
+        this.player.position = position;
+        this.player.angle = angle;
+        this.player.rotateSpeed = 0.05;
+        this.player.movementSpeed = 0.01;
+
         this.camera.resize();
     }
 
@@ -103,28 +111,33 @@ export class GameState implements State {
     }
 
     update(time: number) {
-        if(!TouchManager.isTouched) {
-            const movementX = MouseManager.movement.x;
-            if (movementX) this.camera.rotate(movementX * this.rotateSpeed);
-        }
-        if (KeyInputManager.isDown(Keys.LEFT_ARROW_KEY)) this.camera.rotate(-time * this.rotateSpeed);
-        if (KeyInputManager.isDown(Keys.RIGHT_ARROW_KEY)) this.camera.rotate(time * this.rotateSpeed);
+        if (KeyInputManager.isDown(Keys.LEFT_ARROW_KEY)) this.player.rotate(-time * this.player.rotateSpeed);
+        if (KeyInputManager.isDown(Keys.RIGHT_ARROW_KEY)) this.player.rotate(time * this.player.rotateSpeed);
         
         TouchManager.touches.forEach(touch => {
-            if(touch.position.x > this.camera.width) {
-                this.camera.rotate(-touch.move.x * this.rotateSpeed * time);
+            if(touch.position.x > this.camera.width / 2) {
+                this.player.rotate(-touch.move.x * this.player.rotateSpeed * time);
             } else {
-                this.camera.move(touch.move.normalize().scale(this.movementSpeed * time));
+                this.player.move(
+                    touch.move
+                        .normalize()
+                        .rotate(-90 + this.player.angle)
+                        .scale(this.player.movementSpeed * time), 
+                    this.world.map
+                );
             }
         })
 
-        if (KeyInputManager.isDown(Keys.UP_ARROW_KEY)) this.camera.move(Vector2D.fromAngle(this.camera.angle, this.movementSpeed * time));
-        if (KeyInputManager.isDown(Keys.DOWN_ARROW_KEY)) this.camera.move(Vector2D.fromAngle(this.camera.angle, -this.movementSpeed * time));
+        if (KeyInputManager.isDown(Keys.UP_ARROW_KEY)) this.player.move(Vector2D.fromAngle(this.player.angle, this.player.movementSpeed * time), this.world.map);
+        if (KeyInputManager.isDown(Keys.DOWN_ARROW_KEY)) this.player.move(Vector2D.fromAngle(this.player.angle, -this.player.movementSpeed * time), this.world.map);
         
-        if (KeyInputManager.isDown(Keys.KEY_W)) this.camera.move(Vector2D.fromAngle(this.camera.angle, this.movementSpeed * time));
-        if (KeyInputManager.isDown(Keys.KEY_S)) this.camera.move(Vector2D.fromAngle(this.camera.angle, -this.movementSpeed * time));
-        if (KeyInputManager.isDown(Keys.KEY_A)) this.camera.move(Vector2D.fromAngle(this.camera.angle - 90, this.movementSpeed * time / 2));
-        if (KeyInputManager.isDown(Keys.KEY_D)) this.camera.move(Vector2D.fromAngle(this.camera.angle - 90, -this.movementSpeed * time / 2));        
+        if (KeyInputManager.isDown(Keys.KEY_W)) this.player.move(Vector2D.fromAngle(this.player.angle, this.player.movementSpeed * time), this.world.map);
+        if (KeyInputManager.isDown(Keys.KEY_S)) this.player.move(Vector2D.fromAngle(this.player.angle, -this.player.movementSpeed * time), this.world.map);
+        if (KeyInputManager.isDown(Keys.KEY_A)) this.player.move(Vector2D.fromAngle(this.player.angle - 90, this.player.movementSpeed * time / 2), this.world.map);
+        if (KeyInputManager.isDown(Keys.KEY_D)) this.player.move(Vector2D.fromAngle(this.player.angle - 90, -this.player.movementSpeed * time / 2), this.world.map);
+        
+        this.camera.position = this.player.position;
+        this.camera.angle = this.player.angle;
     }
 
     destroy() {

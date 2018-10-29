@@ -52,5 +52,7 @@ export class Game {
     resize() {
         this.canvas.width = this.width = (window.innerWidth / this.scale);
         this.canvas.height = this.height = (window.innerHeight / this.scale);
+
+        console.log(this.width, this.height);
     }
 }

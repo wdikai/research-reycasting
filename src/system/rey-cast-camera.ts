@@ -21,6 +21,7 @@ interface CameraOptions {
     
     width: number;
     height: number;
+    scale: number;
     halfScreen: number;
     columnSize: number;
 
@@ -41,6 +42,7 @@ export class RayCastCamera {
     height: number;
     halfScreen: number;
     columnSize: number;
+    scale: number;
 
     world?: World;
 
@@ -59,6 +61,8 @@ export class RayCastCamera {
         this.halfScreen = options.halfScreen;
         this.columnSize = options.columnSize;
 
+        this.scale = options.scale;
+
         this.world = options.world;
         window.addEventListener('resize', () => this.resize());
     }
@@ -72,12 +76,13 @@ export class RayCastCamera {
     }
 
     public resize() {
-        const width = (window.innerWidth / 2);
-        const height = (window.innerHeight / 2);
+        const width = (window.innerWidth / this.scale);
+        const height = (window.innerHeight / this.scale);
         const resolution = width / height;
 
         this.width = width;
         this.height = height;
+        console.log(this.width, this.height);
 
         this.viewAngle = 90 / Math.PI * resolution;
         this.rayCount = width / this.columnSize;

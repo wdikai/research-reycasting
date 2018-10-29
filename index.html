@@ -15,11 +15,24 @@
         width: 100%;
         height: 100%;
     }
+
+    #fullscreen {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+    }
+    
+    #fullscreen:-webkit-full-screen,
+    #fullscreen:-moz-full-screen,
+    #fullscreen:-ms-fullscreen,
+    #fullscreen:fullscreen {
+        display: none;
+    }
 </style>
 
 <body oncontextmenu="return false;">
-    <canvas id="canvas">
-    </canvas>
+    <canvas id="canvas"></canvas>
+    <button id="fullscreen">Fullscreen</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.20.12/system.js"></script>
     <script src="./dist/bundle.js"></script>
