@@ -1,4 +1,4 @@
-import { KeyInputManager, Keys } from "../event/index";
+import { KeyInputManager, Keys, MouseManager, TouchManager } from "../event/index";
 import { Vector2D } from "../math/index";
 import { BufferRenderer } from "../graphics/renderer";
 import { RayCastCamera } from "../system/rey-cast-camera";
@@ -95,17 +95,28 @@ export class GameState implements State {
     }
 
     update(time: number) {
+        if(!TouchManager.isTouched) {
+            const movementX = MouseManager.movement.x;
+            if (movementX) this.camera.rotate(movementX * this.rotateSpeed);
+        }
         if (KeyInputManager.isDown(Keys.LEFT_ARROW_KEY)) this.camera.rotate(-time * this.rotateSpeed);
         if (KeyInputManager.isDown(Keys.RIGHT_ARROW_KEY)) this.camera.rotate(time * this.rotateSpeed);
+        
+        TouchManager.touches.forEach(touch => {
+            if(touch.position.x > this.camera.width) {
+                this.camera.rotate(touch.move.x * this.rotateSpeed * 3);
+            } else {
+                this.camera.move(touch.move.normalize().scale(this.movementSpeed * time));
+            }
+        })
 
         if (KeyInputManager.isDown(Keys.UP_ARROW_KEY)) this.camera.move(Vector2D.fromAngle(this.camera.angle, this.movementSpeed * time));
         if (KeyInputManager.isDown(Keys.DOWN_ARROW_KEY)) this.camera.move(Vector2D.fromAngle(this.camera.angle, -this.movementSpeed * time));
-
         
         if (KeyInputManager.isDown(Keys.KEY_W)) this.camera.move(Vector2D.fromAngle(this.camera.angle, this.movementSpeed * time));
         if (KeyInputManager.isDown(Keys.KEY_S)) this.camera.move(Vector2D.fromAngle(this.camera.angle, -this.movementSpeed * time));
         if (KeyInputManager.isDown(Keys.KEY_A)) this.camera.move(Vector2D.fromAngle(this.camera.angle - 90, this.movementSpeed * time / 2));
-        if (KeyInputManager.isDown(Keys.KEY_D)) this.camera.move(Vector2D.fromAngle(this.camera.angle - 90, -this.movementSpeed * time / 2));
+        if (KeyInputManager.isDown(Keys.KEY_D)) this.camera.move(Vector2D.fromAngle(this.camera.angle - 90, -this.movementSpeed * time / 2));        
     }
 
     destroy() {

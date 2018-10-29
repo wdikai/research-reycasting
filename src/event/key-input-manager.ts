@@ -1,40 +1,32 @@
-import { Dictionary } from "../utils/dictionary";
+const keys: any = {};
 
-interface KeyEvent {
-    down: boolean; 
-    click: boolean; 
-};
-const keys: Dictionary<KeyEvent> = {};
+window.addEventListener('keyup', makeHandler(false));
+window.addEventListener('keydown', makeHandler(true));
 
-window.addEventListener('keyup', function (event) {
-    var keyCode = event.keyCode;
-    if(!keys[keyCode]) {
-        keys[keyCode] = {down: false, click: false};
+function makeHandler(value: boolean) {
+    return (event: KeyboardEvent) => {
+        var keyCode = event.keyCode;
+        if (!keys[keyCode]) {
+            keys[keyCode] = {
+                down: false,
+                click: false
+            };
+        }
+
+        keys[keyCode].down = value;
+        keys[keyCode].click = value;
     }
-
-    keys[keyCode].down = false;
-    keys[keyCode].click = false;
-});
-
-window.addEventListener('keydown', function (event) {
-    var keyCode = event.keyCode;
-    if(!keys[keyCode]) {
-        keys[keyCode] = {down: false, click: false};
-    }
-
-    keys[keyCode].down = true;
-    keys[keyCode].click = true;
-});
+}
 
 export class KeyInputManager {
     static isDown(keyCode): boolean {
-        return keys[keyCode] ? keys[keyCode].down: false;
+        return keys[keyCode] ? keys[keyCode].down : false;
     }
 
     static isClick(keyCode): boolean {
-        if(keys[keyCode]) {
+        if (keys[keyCode]) {
             const result = keys[keyCode].click;
-            keys[keyCode].click = true
+            keys[keyCode].click = false;
             return result;
         }
 
