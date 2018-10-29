@@ -1,6 +1,5 @@
 import { Game } from './system/game';
 import { GameState } from './states/game';
-import { MouseManager } from './event/index';
 
 const canvas = < HTMLCanvasElement > document.getElementById('canvas');
 const fullscreenButton = document.getElementById('fullscreen');

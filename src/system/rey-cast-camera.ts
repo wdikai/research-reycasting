@@ -82,7 +82,6 @@ export class RayCastCamera {
 
         this.width = width;
         this.height = height;
-        console.log(this.width, this.height);
 
         this.viewAngle = 90 / Math.PI * resolution;
         this.rayCount = width / this.columnSize;
