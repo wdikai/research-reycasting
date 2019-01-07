@@ -3,11 +3,9 @@ import { BufferRenderer } from "../graphics/renderer";
 import { toRudian } from "../math/utils";
 import { Ray, RayHit } from "../math/ray";
 import { World } from "./world";
+import { ResourceManager } from "./resource-manager";
 
 const TILE_SIZE = 16;
-
-const image = new Image();
-image.src = './assets/tiles.png'
 
 interface CameraOptions {
     position: Vector2D;
@@ -65,6 +63,7 @@ export class RayCastCamera {
 
         this.world = options.world;
         window.addEventListener('resize', () => this.resize());
+        this.resize();
     }
 
     public move(vector: Vector2D) {
@@ -121,7 +120,7 @@ export class RayCastCamera {
 
             graphics.setShadeMode(true);
             graphics.setZIndex(hit.distance);
-            graphics.drawImage(image, x, y, this.columnSize, height, textureX, 0, 1, TILE_SIZE);
+            graphics.drawImage(ResourceManager.instance.getTexture('tiles'), x, y, this.columnSize, height, textureX, 0, 1, TILE_SIZE);
             graphics.setShadeMode(false);
         }
     }
@@ -138,7 +137,7 @@ export class RayCastCamera {
             const y = bottom - this.height;
     
             bufferRenderer.setZIndex(distance)
-            bufferRenderer.drawImage(image, x, y, height, height, TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
+            // bufferRenderer.drawImage(image, x, y, height, height, TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
         }
     }
 }

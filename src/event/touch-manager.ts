@@ -13,7 +13,7 @@ window.addEventListener('touchstart', (event: TouchEvent) => {
     const changedTouches = event.changedTouches;
     for (let touchNumber = 0; touchNumber < event.changedTouches.length; touchNumber++) {
         const touchEvent = changedTouches[touchNumber];
-        const position = new Vector2D(touchEvent.clientX, touchEvent.clientY);
+        const position = new Vector2D(touchEvent.clientX / 2, touchEvent.clientY / 2);
         touchDatas[touchEvent.identifier] = {
             identifier: touchEvent.identifier,
             move: Vector2D.zero,
@@ -30,7 +30,7 @@ window.addEventListener('touchmove', (event: TouchEvent) => {
             identifier: touchEvent.identifier
         };
         
-        touchData.lastTouch = new Vector2D(touchEvent.clientX, touchEvent.clientY);
+        touchData.lastTouch = new Vector2D(touchEvent.clientX / 2, touchEvent.clientY / 2);
         touchData.move = touchData.position.sub(touchData.lastTouch).normalize();
     }
 });

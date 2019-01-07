@@ -1,5 +1,7 @@
 import { Color } from "./color";
 import { toRudian } from "../math/utils";
+import { Graphics } from "./graphics";
+import { Texture } from "./texture";
 
 declare type CanvasImageSource = any;
 
@@ -13,7 +15,7 @@ interface Shape2D {
 
     hasShade: boolean;
 
-    draw(graphics: CanvasRenderingContext2D): void;
+    draw(graphics: Graphics): void;
 }
 
 class Arc2D implements Shape2D {
@@ -41,13 +43,8 @@ class Arc2D implements Shape2D {
         this.hasShade = false;
     }
 
-    draw(graphics: CanvasRenderingContext2D): void {
-        graphics.fillStyle = this.color.toString();
-        graphics.beginPath();
-        graphics.lineWidth = this.width;
-        graphics.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle);
-        this.filled ? graphics.fill(): graphics.stroke();
-        graphics.closePath()
+    draw(graphics: Graphics): void {
+        graphics.drawArc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.color);
     }
 }
 
@@ -71,9 +68,8 @@ class FilledRectangle implements Shape2D {
         this.color = data.color;
     }
 
-    draw(graphics: CanvasRenderingContext2D): void {
-        graphics.fillStyle = this.color.toString();
-        graphics.fillRect(this.x, this.y, this.width, this.heigh);
+    draw(graphics: Graphics): void {
+        graphics.drawRect(this.x, this.y, this.width, this.heigh, this.color);
     }
 }
 
@@ -88,7 +84,7 @@ class Texture2D implements Shape2D {
     clipY: number;
     clipWidth: number;
     clipHeigh: number;
-    image: CanvasImageSource;
+    image: Texture;
 
     constructor(data) {
         this.image = data.image;
@@ -103,32 +99,33 @@ class Texture2D implements Shape2D {
         this.clipWidth = data.clipWidth;
         this.clipHeigh = data.clipHeigh;
     }
+    
+    draw(graphics1: Graphics): void {
 
-    draw(graphics: CanvasRenderingContext2D): void {
-        graphics.drawImage(
+        graphics1.drawTexture(
             this.image,
-            this.clipX !== undefined ? this.clipX : this.x,
-            this.clipY !== undefined ? this.clipY : this.y,
-            this.clipWidth !== undefined ? this.clipWidth : this.width,
-            this.clipHeigh !== undefined ? this.clipHeigh : this.heigh,
             this.x,
             this.y,
             this.width,
             this.heigh,
+            this.clipX,
+            this.clipY,
+            this.clipWidth,
+            this.clipHeigh,
         );
     }
 }
 
 export class BufferRenderer {
     private buffer: Shape2D[];
-    private graphics: CanvasRenderingContext2D;
+    private graphics: Graphics;
 
     private color: Color;
     private hasShade: boolean;
     private zIndex: number;
     private maxZIndex: number
 
-    constructor(graphics: CanvasRenderingContext2D, maxZIndex: number = Infinity) {
+    constructor(graphics: Graphics, maxZIndex: number = Infinity) {
         this.buffer = [];
         this.graphics = graphics;
         this.maxZIndex = maxZIndex;
@@ -197,19 +194,19 @@ export class BufferRenderer {
     }
 
     render() {
-       this.graphics.imageSmoothingEnabled = false;
+    //    this.graphics.imageSmoothingEnabled = false;
         this.buffer
             .filter(operation => operation.zIndex < this.maxZIndex)
             .sort((firstOperation, secondOperation) => secondOperation.zIndex - firstOperation.zIndex)
             .forEach(operation => {
                 operation.draw(this.graphics);
 
-                if(operation.hasShade && operation.width && operation.heigh) {
-                    this.graphics.fillStyle = "#000000";
-                    this.graphics.globalAlpha = 1 - (1 - (operation.zIndex / this.maxZIndex));
-                    this.graphics.fillRect(operation.x, operation.y, operation.width, operation.heigh);
-                    this.graphics.globalAlpha = 1;
-                }
+                // if(operation.hasShade && operation.width && operation.heigh) {
+                //     this.graphics.fillStyle = "#000000";
+                //     this.graphics.globalAlpha = 1 - (1 - (operation.zIndex / this.maxZIndex));
+                //     this.graphics.fillRect(operation.x, operation.y, operation.width, operation.heigh);
+                //     this.graphics.globalAlpha = 1;
+                // }
             });
 
         this.buffer = [];

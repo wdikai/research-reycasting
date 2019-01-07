@@ -76,7 +76,7 @@ export class GameState implements State {
             height,
             columnSize,
             world,
-            scale: 1
+            scale: 2
         });
 
         this.world = world;
@@ -85,8 +85,8 @@ export class GameState implements State {
         this.player = new Player();
         this.player.position = position;
         this.player.angle = angle;
-        this.player.rotateSpeed = 0.05;
-        this.player.movementSpeed = 0.01;
+        this.player.rotateSpeed = 0.1;
+        this.player.movementSpeed = 0.005;
 
         this.camera.resize();
     }
@@ -104,6 +104,7 @@ export class GameState implements State {
         if(TouchManager.isTouched) {
             TouchManager.touches.forEach(touch => {
                 renderer.setZIndex(0);
+                renderer.setColor(Color.Black);
                 renderer.arc(touch.position.x, touch.position.y, 20, 0, 360, 5);
                 renderer.arc(touch.lastTouch.x, touch.lastTouch.y, 30, 0, 360, 5);
             });
@@ -111,6 +112,13 @@ export class GameState implements State {
     }
 
     update(time: number) {
+        if(!TouchManager.isTouched) {
+            const movementX = MouseManager.movement.x;
+            if (movementX) {
+                this.player.rotate(time * this.player.rotateSpeed * movementX / 100);
+            }
+        }
+
         if (KeyInputManager.isDown(Keys.LEFT_ARROW_KEY)) this.player.rotate(-time * this.player.rotateSpeed);
         if (KeyInputManager.isDown(Keys.RIGHT_ARROW_KEY)) this.player.rotate(time * this.player.rotateSpeed);
         

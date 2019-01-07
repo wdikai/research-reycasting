@@ -1,28 +1,38 @@
-import { Game } from './system/game';
-import { GameState } from './states/game';
+import {
+  Game
+} from './system/game';
+import {
+  GameState
+} from './states/game';
+import { ResourceManager } from './system/resource-manager';
 
 const canvas = < HTMLCanvasElement > document.getElementById('canvas');
 const fullscreenButton = document.getElementById('fullscreen');
 fullscreenButton.addEventListener('click', () => launchFullScreen(canvas));
 
 const game = new Game({
-    canvas: canvas,
-    width: 960,
-    height: 720,
-    maxZIndex: 60,
-    scale: 1
+  canvas: canvas,
+  width: 960,
+  height: 720,
+  maxZIndex: 60,
+  scale: 2
 });
 
 game.resize();
 game.manager.register('game', GameState);
-game.manager.setState('game');
+
+ResourceManager.instance
+  .addTExture('bat', './assets/bat.png')
+  .addTExture('tiles', './assets/tiles.png')
+  .textureLoaded.once(() => game.manager.setState('game'));
 
 function launchFullScreen(element) {
-    if(element.requestFullScreen) {
-      element.requestFullScreen();
-    } else if(element.mozRequestFullScreen) {
-      element.mozRequestFullScreen();
-    } else if(element.webkitRequestFullScreen) {
-      element.webkitRequestFullScreen();
-    }
-  }
+  polifil(element);
+  element.requestFullScreen();
+  element.requestPointerLock();
+}
+
+function polifil(element) {
+  element.requestFullScreen = element.requestFullScreen || element.mozRequestFullScreen || element.webkitRequestFullScreen;
+  element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+}

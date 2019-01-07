@@ -5,9 +5,12 @@ export class Color {
     static readonly Blue = new Color(0, 0, 255);
     static readonly White = new Color(255, 255, 255);
 
-    constructor(public readonly red: number, public readonly green: number, public readonly blue: number) {}
+    constructor(public readonly red: number, 
+                public readonly green: number, 
+                public readonly blue: number, 
+                public readonly alpha: number = 1) {}
     
     toString() {
-        return `rgb(${this.red},${this.green},${this.blue})`;
+        return `rgba(${this.red},${this.green},${this.blue},${this.alpha})`;
     }
 }
