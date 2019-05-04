@@ -1,12 +1,13 @@
 import { KeyInputManager, Keys, MouseManager, TouchManager } from "../event/index";
 import { Vector2D } from "../math/index";
-import { BufferRenderer } from "../graphics/renderer";
+import { BufferRenderer } from "../graphics/buffer-renderer";
 import { RayCastCamera } from "../system/rey-cast-camera";
 import { World } from "../system/world";
 import { Color } from "../graphics/color";
 import { State } from "../system/state/state";
 import Map from "../math/map";
 import { Player } from "./entity/player";
+import { Renderer } from "../graphics/renderer";
 
 const wallMap = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -91,7 +92,7 @@ export class GameState implements State {
         this.camera.resize();
     }
 
-    draw(renderer: BufferRenderer) {
+    draw(renderer: Renderer) {
         const halfHeight = this.camera.height / 2;
         renderer.setShadeMode(false);
         renderer.setZIndex(this.camera.rayDistance);
@@ -102,12 +103,12 @@ export class GameState implements State {
         this.camera.draw(renderer);
 
         if(TouchManager.isTouched) {
-            TouchManager.touches.forEach(touch => {
-                renderer.setZIndex(0);
-                renderer.setColor(Color.Black);
-                renderer.arc(touch.position.x, touch.position.y, 20, 0, 360, 5);
-                renderer.arc(touch.lastTouch.x, touch.lastTouch.y, 30, 0, 360, 5);
-            });
+            // TouchManager.touches.forEach(touch => {
+            //     renderer.setZIndex(0);
+            //     renderer.setColor(Color.Black);
+            //     renderer.arc(touch.position.x, touch.position.y, 20, 0, 360, 5);
+            //     renderer.arc(touch.lastTouch.x, touch.lastTouch.y, 30, 0, 360, 5);
+            // });
         }
     }
 

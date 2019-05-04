@@ -1,9 +1,10 @@
 import { Vector2D } from "../math/index";
-import { BufferRenderer } from "../graphics/renderer";
+import { BufferRenderer } from "../graphics/buffer-renderer";
 import { toRudian } from "../math/utils";
 import { Ray, RayHit } from "../math/ray";
 import { World } from "./world";
 import { ResourceManager } from "./resource-manager";
+import { Renderer } from "../graphics/renderer";
 
 const TILE_SIZE = 16;
 
@@ -89,14 +90,14 @@ export class RayCastCamera {
         this.halfScreen = width / 2;
     }
 
-    public draw(renderer: BufferRenderer): void {
+    public draw(renderer: Renderer): void {
         if(this.world) {
             this.renderColumns(renderer);
             this.drawObject(renderer);
         }
     }
 
-    private renderColumns(renderer: BufferRenderer) {
+    private renderColumns(renderer: Renderer) {
         for (let rayNumber = 0; rayNumber <= this.rayCount; rayNumber++) {
             const angle = this.angle + (rayNumber - this.halfRayCount) * this.focalLength;
             const hits = Ray.cast(this.world.map, this.position, angle, this.rayDistance);
@@ -104,7 +105,7 @@ export class RayCastCamera {
         }
     }
 
-    private renderColumn(rayNumber: number, hits: RayHit[], graphics: BufferRenderer) {
+    private renderColumn(rayNumber: number, hits: RayHit[], graphics: Renderer) {
         let hit: RayHit, hitNumber = -1;
         while (++hitNumber < hits.length && hits[hitNumber].height <= 0);
         hit = hits[hitNumber];
@@ -125,19 +126,19 @@ export class RayCastCamera {
         }
     }
 
-    private drawObject(bufferRenderer: BufferRenderer) {
-        for(let enemy of this.world.objects) {
-            const playerNormal = Vector2D.fromAngle(this.angle)
-            const enamyNormal = enemy.position.sub(this.position)
-            const distance = enamyNormal.length;
-            const angle = Vector2D.angle(enamyNormal, playerNormal)
-            const height = this.height / distance * 2;
-            const bottom = this.height / 2 * (1 +  2 / distance);
-            const x = this.halfScreen + angle * this.width / this.viewAngle - this.height / 2;
-            const y = bottom - this.height;
+    private drawObject(bufferRenderer: Renderer) {
+        // for(let enemy of this.world.objects) {
+        //     const playerNormal = Vector2D.fromAngle(this.angle)
+        //     const enamyNormal = enemy.position.sub(this.position)
+        //     const distance = enamyNormal.length;
+        //     const angle = Vector2D.angle(enamyNormal, playerNormal)
+        //     const height = this.height / distance * 2;
+        //     const bottom = this.height / 2 * (1 +  2 / distance);
+        //     const x = this.halfScreen + angle * this.width / this.viewAngle - this.height / 2;
+        //     const y = bottom - this.height;
     
-            bufferRenderer.setZIndex(distance)
-            // bufferRenderer.drawImage(image, x, y, height, height, TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
-        }
+        //     bufferRenderer.setZIndex(distance)
+        //     // bufferRenderer.drawImage(image, x, y, height, height, TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
+        // }
     }
 }

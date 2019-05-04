@@ -11,7 +11,8 @@ import {
 
 export class Graphics {
     buffer: ImageData;
-    constructor(w, h) {
+    zBuffer: Uint16Array;
+    constructor(w: number, h: number) {
         this.resize(w, h);
     }
 
@@ -23,20 +24,33 @@ export class Graphics {
         return this.buffer.height;
     }
 
-    resize(w, h) {
-        this.buffer = new ImageData(w, h);
+    apply(context: CanvasRenderingContext2D): void {
+        context.putImageData(this.buffer, 0, 0);
+        this.buffer = new ImageData(this.width, this.height);
+        this.zBuffer.fill(1000000)
     }
 
-    drawPixel(x: number, y: number, color: Color) {
+    resize(w: number, h: number): void {
+        this.buffer = new ImageData(w, h);
+        this.zBuffer = new Uint16Array(w * h).fill(10000000);
+    }
+
+    drawPixel(x: number, y: number, color: Color, zIndex: number = null): void {
+        let position;
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
-        const position = this.width * 4 * y + x * 4;
+        position = this.width * y + x;
+
+        if (zIndex !== null && this.zBuffer[position] < zIndex) return;
+        if (zIndex) this.zBuffer[position] = zIndex;
+        position *= 4;
+
         this.buffer.data[position] = color.red;
         this.buffer.data[position + 1] = color.green;
         this.buffer.data[position + 2] = color.blue;
         this.buffer.data[position + 3] = 255;
     }
 
-    drawLine(x0: number, y0: number, x1: number, y1: number, color: Color) {
+    drawLine(x0: number, y0: number, x1: number, y1: number, color: Color, zIndex ? : number) {
         const dx = Math.abs(x1 - x0),
             sx = x0 < x1 ? 1 : -1;
         const dy = Math.abs(y1 - y0),
@@ -44,7 +58,7 @@ export class Graphics {
         let err = (dx > dy ? dx : -dy) / 2;
         while (true) {
             const e2 = err;
-            this.drawPixel(x0, y0, color);
+            this.drawPixel(x0, y0, color, zIndex);
             if (e2 > -dx) {
                 err -= dy;
                 x0 += sx;
@@ -57,9 +71,9 @@ export class Graphics {
         }
     }
 
-    drawRect(x: number, y: number, w: number, h: number, color: Color) {
+    drawRect(x: number, y: number, w: number, h: number, color: Color, zIndex ? : number) {
         for (let x1 = x; x1 < x + w; x1++) {
-            this.drawLine(x1, y, x1, y + h, color);
+            this.drawLine(x1, y, x1, y + h, color, zIndex);
         }
     }
 
@@ -75,7 +89,8 @@ export class Graphics {
                 xClip: number = 0,
                 yClip: number = 0,
                 wClip ? : number,
-                hClip ? : number) {
+                hClip ? : number,
+                zIndex ? : number) {
         let xShift = 0;
         let yShift = 0;
 
@@ -99,7 +114,7 @@ export class Graphics {
                 const yS = Math.floor(lerp(0, hClip, yP / h));
 
                 const color = texture.getColor(xS + xClip, yS + yClip);
-                if (color.alpha) this.drawPixel(xOffset, yOffset, color);
+                if (color.alpha) this.drawPixel(xOffset, yOffset, color, zIndex);
             }
         }
     }

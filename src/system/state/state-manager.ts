@@ -1,7 +1,7 @@
 import { State } from "./state";
 import { Class } from "../../utils/class";
 import { Dictionary } from "../../utils/dictionary";
-import { BufferRenderer } from "../../graphics/renderer";
+import { Renderer } from "../../graphics/renderer";
 
 export class StateManager implements State {
     currentState: State;
@@ -47,7 +47,7 @@ export class StateManager implements State {
         }
     }
 
-    public draw(graphics: BufferRenderer): void {
+    public draw(graphics: Renderer): void {
         if(this.currentState) {
             this.currentState.draw(graphics);
         }

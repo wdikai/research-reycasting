@@ -1,5 +1,6 @@
 import { StateManager } from "./state/state-manager";
-import { BufferRenderer } from "../graphics/renderer";
+import { Renderer } from "../graphics/renderer";
+import { BufferRenderer } from "../graphics/buffer-renderer";
 import { Graphics } from "../graphics/graphics";
 
 export interface GameOptions {
@@ -17,7 +18,7 @@ export class Game {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
     graphics: Graphics;
-    renderer: BufferRenderer;
+    renderer: Renderer;
 
     lastTick: number;
     width: number;
@@ -36,7 +37,7 @@ export class Game {
         this.canvas = options.canvas;
         this.context = context;
         this.graphics = new Graphics(options.width, options.height)
-        this.renderer = new BufferRenderer(this.graphics, options.maxZIndex);
+        this.renderer = new Renderer(this.graphics, options.maxZIndex);
         this.width = options.width;
         this.height = options.height;
         this.scale = options.scale;
@@ -62,7 +63,7 @@ export class Game {
         this.manager.update(deltaTime);
         this.manager.draw(this.renderer); 
         this.renderer.render();
-        this.context.putImageData(this.graphics.buffer, 0, 0);
+        this.graphics.apply(this.context);
         this.graphics.resize(this.width,  this.height);
 
         this.context.fillStyle = '#000';
