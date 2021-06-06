@@ -36,6 +36,12 @@ export class Renderer {
         this.zIndex = zIndex;
     }
 
+    drawPixel(x: number, y: number): void {
+        const { color, zIndex } = this;
+
+        if(this.canDraw) this.graphics.drawPixel(x, y, color, zIndex);
+    }
+
     fillRect(x: number, y: number, width: number, heigh: number): void {
         const { color, zIndex } = this;
 

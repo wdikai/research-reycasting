@@ -54,7 +54,7 @@ export class GameState implements State {
         const map = new Map(22, wallSize, wallMap);
         const world = new World(map);
 
-        const position = new Vector2D(7.2, 3);
+        const position = new Vector2D(9.2, 8.5);
 
         const angle = 180;
         const rayDistance = viewDistance - 1;
@@ -93,13 +93,13 @@ export class GameState implements State {
     }
 
     draw(renderer: Renderer) {
-        const halfHeight = this.camera.height / 2;
-        renderer.setShadeMode(false);
-        renderer.setZIndex(this.camera.rayDistance);
-        renderer.setColor(this.cailColor);
-        renderer.fillRect(0, 0, this.camera.width, halfHeight);
-        renderer.setColor(this.floorColor);
-        renderer.fillRect(0, halfHeight, this.camera.width, halfHeight);
+        // const halfHeight = this.camera.height / 2;
+        // renderer.setShadeMode(false);
+        // renderer.setZIndex(this.camera.rayDistance);
+        // renderer.setColor(this.cailColor);
+        // renderer.fillRect(0, 0, this.camera.width, halfHeight);
+        // renderer.setColor(this.floorColor);
+        // renderer.fillRect(0, halfHeight, this.camera.width, halfHeight);
         this.camera.draw(renderer);
 
         if(TouchManager.isTouched) {

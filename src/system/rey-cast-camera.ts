@@ -5,6 +5,7 @@ import { Ray, RayHit } from "../math/ray";
 import { World } from "./world";
 import { ResourceManager } from "./resource-manager";
 import { Renderer } from "../graphics/renderer";
+import { Graphics } from "../graphics/graphics";
 
 const TILE_SIZE = 16;
 
@@ -123,6 +124,34 @@ export class RayCastCamera {
             graphics.setZIndex(hit.distance);
             graphics.drawImage(ResourceManager.instance.getTexture('tiles'), x, y, this.columnSize, height, textureX, 0, 1, TILE_SIZE);
             graphics.setShadeMode(false);
+            this.renderFloor(x, y + height, this.height, z, hit, graphics);
+        }
+    }
+
+    private renderFloor(x: number, bottom: number, height: number, z: number, hit: RayHit, graphics: Renderer): void {
+        for(let y = Math.floor(bottom + 1); y < height; y++) {
+            const currentDist = height / (2 * y - height); //you could make a small lookup table for this instead
+
+            const weight = currentDist / z;
+
+            const currentFloorX = weight * hit.position.x + (1.0 - weight) * this.position.x;
+            const currentFloorY = weight * hit.position.y + (1.0 - weight) * this.position.y;
+
+            const floorTexX = Math.floor(currentFloorX * 32) % 32;
+            const floorTexY = Math.floor(currentFloorY * 32) % 32;
+
+            const color = ResourceManager.instance
+                .getTexture('tiles')
+                .getColor(Math.floor(floorTexX), Math.floor(floorTexY));
+
+            graphics.setColor(color);
+            graphics.setZIndex(Math.floor(currentDist));
+            graphics.drawPixel(x, y);
+            
+            // //floor
+            // buffer[y][x] = (texture[floorTexture][texWidth * floorTexY + floorTexX] >> 1) & 8355711;
+            // //ceiling (symmetrical!)
+            // buffer[h - y][x] = texture[6][texWidth * floorTexY + floorTexX];
         }
     }
 
